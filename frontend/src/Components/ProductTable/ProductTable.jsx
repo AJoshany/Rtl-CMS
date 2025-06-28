@@ -12,15 +12,19 @@ export default function ProductTable() {
   const [isShowEditModal, setIsShowEditModal] = useState(false);
 
   const [allProducts, setAllProducts] = useState([]);
+  const [productID, setProductID] = useState(null);
 
   useEffect(() => {
+    getAllProducts();
+  }, []);
+
+  const getAllProducts = () => {
     fetch("http://localhost:8000/api/products/")
       .then((res) => res.json())
       .then((product) => {
-        console.log(product);
         setAllProducts(product);
       });
-  }, []);
+  };
 
   const deleteModalCancelAction = () => {
     console.log("Cancel");
@@ -29,6 +33,14 @@ export default function ProductTable() {
 
   const deleteModalSubmitAction = () => {
     console.log("Submit");
+    fetch(`http://localhost:8000/api/products/${productID}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        setIsShowDeleteModal(false);
+        getAllProducts();
+      });
     setIsShowDeleteModal(false);
   };
 
@@ -77,7 +89,10 @@ export default function ProductTable() {
                   </button>
                   <button
                     className="products-table-btn"
-                    onClick={() => setIsShowDeleteModal(true)}
+                    onClick={() => {
+                      setIsShowDeleteModal(true);
+                      setProductID(product.id);
+                    }}
                   >
                     حذف
                   </button>
